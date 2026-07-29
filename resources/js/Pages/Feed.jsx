@@ -17,7 +17,7 @@ export default function Feed({ auth, posts }) {
     }, [flash]);
 
     return (
-        <AuthenticatedLayout user={auth.user} header={<h2 className="font-semibold text-xl text-gray-800">Feed</h2>}>
+        <AuthenticatedLayout user={auth.user} header={<h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200">Feed</h2>}>
             <Head title="Feed" />
 
             {visible && (
@@ -34,7 +34,7 @@ export default function Feed({ auth, posts }) {
                         {posts.length > 0 ? (
                             posts.map((post) => <PostCard key={post.id} post={post} auth={auth} />)
                         ) : (
-                            <div className="text-center text-gray-500 py-10 bg-white border border-gray-200 rounded-lg">
+                            <div className="text-center text-gray-500 dark:text-gray-400 py-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
                                 There is no post.
                             </div>
                         )}

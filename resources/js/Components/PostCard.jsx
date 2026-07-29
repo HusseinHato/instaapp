@@ -51,9 +51,9 @@ export default function PostCard({ post, auth }) {
     };
 
     return (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 mb-6 overflow-hidden transition-colors duration-200">
             <div className="p-4 flex items-center justify-between">
-                <div className="font-bold text-gray-800">{post.user.name}</div>
+                <div className="font-bold text-gray-800 dark:text-gray-200">{post.user.name}</div>
                 {post.can_delete && (
                     <button onClick={() => setConfirmingPostDeletion(true)} className="text-red-500 text-sm font-semibold hover:underline">
                         Delete Post
@@ -62,11 +62,11 @@ export default function PostCard({ post, auth }) {
             </div>
 
             <Modal show={confirmingPostDeletion} onClose={() => setConfirmingPostDeletion(false)}>
-                <div className="p-6">
-                    <h2 className="text-lg font-medium text-gray-900">
+                <div className="p-6 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
+                    <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
                         Are you sure to delete this post?
                     </h2>
-                    <p className="mt-1 text-sm text-gray-600">
+                    <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
                         Deleted posts cannot be restored.
                     </p>
                     <div className="mt-6 flex justify-end gap-3">
@@ -77,11 +77,11 @@ export default function PostCard({ post, auth }) {
             </Modal>
 
             <Modal show={commentToDelete !== null} onClose={() => setCommentToDelete(null)}>
-                <div className="p-6">
-                    <h2 className="text-lg font-medium text-gray-900">
+                <div className="p-6 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
+                    <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
                         Are you sure to delete this comment?
                     </h2>
-                    <p className="mt-1 text-sm text-gray-600">
+                    <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
                         Deleted comments cannot be restored.
                     </p>
                     <div className="mt-6 flex justify-end gap-3">
@@ -101,18 +101,18 @@ export default function PostCard({ post, auth }) {
             {/* Actions: Like */}
             <div className="p-4 pb-2">
                 <button onClick={toggleLike} className="flex items-center space-x-1 focus:outline-none">
-                    <svg className={`w-7 h-7 ${post.is_liked ? 'text-red-500 fill-current' : 'text-gray-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className={`w-7 h-7 ${post.is_liked ? 'text-red-500 fill-current' : 'text-gray-600 dark:text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
                     </svg>
-                    <span className="font-semibold text-gray-700">{post.likes_count} Likes</span>
+                    <span className="font-semibold text-gray-700 dark:text-gray-300">{post.likes_count} Likes</span>
                 </button>
             </div>
 
             {/* Caption */}
             <div className="px-4 pb-2">
-                <span className="font-bold mr-2">{post.user.name}</span>
-                <span className="text-gray-800">{post.caption}</span>
-                <div className="text-gray-400 text-xs mt-1">{post.created_at}</div>
+                <span className="font-bold mr-2 text-gray-900 dark:text-gray-100">{post.user.name}</span>
+                <span className="text-gray-800 dark:text-gray-200">{post.caption}</span>
+                <div className="text-gray-400 dark:text-gray-500 text-xs mt-1">{post.created_at}</div>
             </div>
 
             {/* Comments Section */}
@@ -121,8 +121,8 @@ export default function PostCard({ post, auth }) {
                     <div className="mt-2 space-y-1">
                         {post.comments.map((comment) => (
                             <div key={comment.id} className="text-sm flex justify-between group">
-                                <div>
-                                    <span className="font-bold mr-2">{comment.user.name}</span>
+                                <div className="text-gray-800 dark:text-gray-200">
+                                    <span className="font-bold mr-2 text-gray-900 dark:text-gray-100">{comment.user.name}</span>
                                     <span>{comment.body}</span>
                                 </div>
                                 {(auth.user && (comment.user_id === auth.user.id || post.can_delete)) && (
@@ -140,10 +140,10 @@ export default function PostCard({ post, auth }) {
             </div>
 
             {/* Comment Form */}
-            <form onSubmit={submitComment} className="border-t border-gray-100 p-3 flex">
+            <form onSubmit={submitComment} className="border-t border-gray-100 dark:border-gray-700 p-3 flex">
                 <input
                     type="text"
-                    className="flex-1 border-none focus:ring-0 text-sm disabled:bg-gray-50"
+                    className="flex-1 border-none focus:ring-0 text-sm bg-transparent text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 disabled:bg-gray-50 dark:disabled:bg-gray-900"
                     placeholder={processing ? "Sending..." : "Add comment..."}
                     value={data.body}
                     onChange={(e) => setData('body', e.target.value)}
@@ -152,7 +152,7 @@ export default function PostCard({ post, auth }) {
                 <button
                     type="submit"
                     disabled={!data.body || processing}
-                    className={`font-semibold text-sm transition ${!data.body || processing ? 'text-blue-300 cursor-not-allowed' : 'text-blue-500 hover:text-blue-700'}`}
+                    className={`font-semibold text-sm transition ${!data.body || processing ? 'text-blue-300 dark:text-blue-700 cursor-not-allowed' : 'text-blue-500 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300'}`}
                 >
                     Send
                 </button>
