@@ -15,28 +15,29 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::with([
-            'user:id,name',
-            'likes',
-            'comments.user:id,name'
-        ])
-        ->withCount(['likes', 'comments'])
-        ->latest()
-        ->get()
-        ->map(function ($post) {
-            return [
-                'id' => $post->id,
-                'caption' => $post->caption,
-                'image_url' => asset('storage/' . $post->image_path),
-                'created_at' => $post->created_at->diffForHumans(),
-                'user' => $post->user,
-                'likes_count' => $post->likes_count,
-                'comments_count' => $post->comments_count,
-                'comments' => $post->comments,
-                'is_liked' => $post->likes->contains('user_id', auth()->id()),
-                'can_delete' => $post->user_id === auth()->id(),
-            ];
-        });
+        $posts = Post::with(['user:id,name', 'likes', 'comments.user:id,name'])
+            ->withCount(['likes', 'comments'])
+            ->latest()
+            ->get()
+            ->map(function ($post) {
+                return $this->formatPost($post);
+            });
+
+        return Inertia::render('Feed', [
+            'posts' => $posts
+        ]);
+    }
+
+    public function dashboard()
+    {
+        $posts = Post::with(['user:id,name', 'likes', 'comments.user:id,name'])
+            ->where('user_id', auth()->id())
+            ->withCount(['likes', 'comments'])
+            ->latest()
+            ->get()
+            ->map(function ($post) {
+                return $this->formatPost($post);
+            });
 
         return Inertia::render('Dashboard', [
             'posts' => $posts
@@ -79,5 +80,24 @@ class PostController extends Controller
         $post->delete();
 
         return back()->with('message', 'Postingan berhasil dihapus!');
+    }
+
+    private function formatPost($post)
+    {
+        $isLoggedIn = auth()->check();
+        $userId = $isLoggedIn ? auth()->id() : null;
+
+        return [
+            'id' => $post->id,
+            'caption' => $post->caption,
+            'image_url' => asset('storage/' . $post->image_path),
+            'created_at' => $post->created_at->diffForHumans(),
+            'user' => $post->user,
+            'likes_count' => $post->likes_count,
+            'comments_count' => $post->comments_count,
+            'comments' => $post->comments,
+            'is_liked' => $isLoggedIn ? $post->likes->contains('user_id', $userId) : false,
+            'can_delete' => $isLoggedIn ? $post->user_id === $userId : false,
+        ];
     }
 }

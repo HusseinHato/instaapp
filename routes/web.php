@@ -8,18 +8,13 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
+// Homepage 
+Route::get('/', [PostController::class, 'index'])->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
+
     // Post Routes
-    Route::get('/dashboard', [PostController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [PostController::class, 'dashboard'])->name('dashboard');
     Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
 

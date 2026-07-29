@@ -1,49 +1,99 @@
 import { useForm, router } from '@inertiajs/react';
+import { useState } from 'react';
+import Modal from '@/Components/Modal'; // Bawaan Breeze
+import DangerButton from '@/Components/DangerButton'; // Bawaan Breeze
+import SecondaryButton from '@/Components/SecondaryButton'; // Bawaan Breeze
 
 export default function PostCard({ post, auth }) {
     const { data, setData, post: postComment, reset, processing } = useForm({
         body: '',
     });
 
+    const isGuest = !auth?.user;
+
+    const [confirmingPostDeletion, setConfirmingPostDeletion] = useState(false);
+
+    const [commentToDelete, setCommentToDelete] = useState(null);
+
     // Handle Like Toggle
     const toggleLike = () => {
+        if (isGuest) return router.get(route('login'));
         router.post(route('posts.like', post.id), {}, { preserveScroll: true });
     };
 
     // Handle Delete Post
     const deletePost = () => {
-        if (confirm('Yakin ingin menghapus postingan ini?')) {
-            router.delete(route('posts.destroy', post.id), { preserveScroll: true });
-        }
+        router.delete(route('posts.destroy', post.id), {
+            preserveScroll: true,
+            onSuccess: () => setConfirmingPostDeletion(false),
+        });
     };
 
     // Handle Add Comment
     const submitComment = (e) => {
         e.preventDefault();
+        if (isGuest) return router.get(route('login'));
+
         postComment(route('comments.store', post.id), {
             preserveScroll: true,
             onSuccess: () => reset('body'),
         });
     };
 
-    // Handle Delete Comment
-    const deleteComment = (commentId) => {
-        if (confirm('Hapus komentar ini?')) {
-            router.delete(route('comments.destroy', commentId), { preserveScroll: true });
-        }
+    // hapus komentar dari Modal
+    const executeDeleteComment = () => {
+        if (!commentToDelete) return;
+
+        router.delete(route('comments.destroy', commentToDelete), {
+            preserveScroll: true,
+            onSuccess: () => setCommentToDelete(null),
+        });
     };
 
     return (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 overflow-hidden">
-            {/* Header: User & Delete Button */}
             <div className="p-4 flex items-center justify-between">
                 <div className="font-bold text-gray-800">{post.user.name}</div>
                 {post.can_delete && (
-                    <button onClick={deletePost} className="text-red-500 text-sm font-semibold hover:underline">
-                        Hapus Post
+                    <button onClick={() => setConfirmingPostDeletion(true)} className="text-red-500 text-sm font-semibold hover:underline">
+                        Delete Post
                     </button>
                 )}
             </div>
+
+            <Modal show={confirmingPostDeletion} onClose={() => setConfirmingPostDeletion(false)}>
+                <div className="p-6">
+                    <h2 className="text-lg font-medium text-gray-900">
+                        Are you sure to delete this post?
+                    </h2>
+                    <p className="mt-1 text-sm text-gray-600">
+                        Deleted posts cannot be restored.
+                    </p>
+                    <div className="mt-6 flex justify-end gap-3">
+                        <SecondaryButton onClick={() => setConfirmingPostDeletion(false)}>Cancel</SecondaryButton>
+                        <DangerButton onClick={deletePost}>Delete Post</DangerButton>
+                    </div>
+                </div>
+            </Modal>
+
+            <Modal show={commentToDelete !== null} onClose={() => setCommentToDelete(null)}>
+                <div className="p-6">
+                    <h2 className="text-lg font-medium text-gray-900">
+                        Are you sure to delete this comment?
+                    </h2>
+                    <p className="mt-1 text-sm text-gray-600">
+                        Deleted comments cannot be restored.
+                    </p>
+                    <div className="mt-6 flex justify-end gap-3">
+                        <SecondaryButton onClick={() => setCommentToDelete(null)}>
+                            Cancel
+                        </SecondaryButton>
+                        <DangerButton onClick={executeDeleteComment}>
+                            Delete Comment
+                        </DangerButton>
+                    </div>
+                </div>
+            </Modal>
 
             {/* Image */}
             <img src={post.image_url} alt="Post Image" className="w-full object-cover max-h-[600px]" />
@@ -75,10 +125,12 @@ export default function PostCard({ post, auth }) {
                                     <span className="font-bold mr-2">{comment.user.name}</span>
                                     <span>{comment.body}</span>
                                 </div>
-                                {/* Hak akses hapus komentar: Pemilik komentar atau pemilik post */}
-                                {(comment.user_id === auth.user.id || post.can_delete) && (
-                                    <button onClick={() => deleteComment(comment.id)} className="text-red-400 text-xs hidden group-hover:block">
-                                        Hapus
+                                {(auth.user && (comment.user_id === auth.user.id || post.can_delete)) && (
+                                    <button
+                                        onClick={() => setCommentToDelete(comment.id)}
+                                        className="text-red-400 text-xs hidden group-hover:block hover:text-red-600 transition"
+                                    >
+                                        Delete
                                     </button>
                                 )}
                             </div>
@@ -91,13 +143,18 @@ export default function PostCard({ post, auth }) {
             <form onSubmit={submitComment} className="border-t border-gray-100 p-3 flex">
                 <input
                     type="text"
-                    className="flex-1 border-none focus:ring-0 text-sm"
-                    placeholder="Tambahkan komentar..."
+                    className="flex-1 border-none focus:ring-0 text-sm disabled:bg-gray-50"
+                    placeholder={processing ? "Sending..." : "Add comment..."}
                     value={data.body}
                     onChange={(e) => setData('body', e.target.value)}
+                    disabled={processing} // Disable input saat loading
                 />
-                <button type="submit" disabled={!data.body || processing} className="text-indigo-600 font-semibold text-sm disabled:opacity-50">
-                    Kirim
+                <button
+                    type="submit"
+                    disabled={!data.body || processing}
+                    className={`font-semibold text-sm transition ${!data.body || processing ? 'text-blue-300 cursor-not-allowed' : 'text-blue-500 hover:text-blue-700'}`}
+                >
+                    Send
                 </button>
             </form>
         </div>
