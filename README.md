@@ -1,58 +1,155 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# InstaApp
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A simple, clean, and modern social photo-sharing web application built with **Laravel**, **Inertia.js**, **React**, and **Tailwind CSS**.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## About the App
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+**InstaApp** allows users to share photos, write captions, interact with posts through likes and comments, and manage their personal profiles in real-time.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Key Features
 
-## Learning Laravel
+- **Authentication**: User registration, login, and secure session management via Laravel Breeze.
+- **Photo Feed**: View community posts and personal dashboard feed.
+- **Create Posts**: Upload images with custom captions.
+- **Likes & Comments**: Interactive like toggles and real-time comment threads.
+- **Profile Management**: Update account details, password, and preferences.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+---
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Tech Stack
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+- **Backend**: [Laravel](https://laravel.com/) (PHP 8.3+)
+- **Frontend**: [React 18](https://react.dev/) with [Inertia.js](https://inertiajs.com/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **Asset Bundler**: [Vite](https://vitejs.dev/)
+- **Database**: [MySQL](https://www.mysql.com/)
 
-## Agentic Development
+---
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Prerequisites
 
+Ensure you have the following installed on your machine:
+
+- **PHP** `>= 8.2` (PHP 8.3 recommended)
+- **Composer** `>= 2.0`
+- **Node.js** `>= 18.0` & **NPM**
+- **MySQL Database Server** (via MySQL CLI, MariaDB, Laragon, XAMPP, etc.)
+
+---
+
+## How to Replicate (Setup Guide)
+
+Follow these steps to run the application locally on your machine:
+
+### 1. Clone the Repository
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git clone <repository-url>
+cd instaapp
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### 2. Install PHP Dependencies
+```bash
+composer install
+```
 
-## Contributing
+### 3. Install Frontend Dependencies
+```bash
+npm install
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 4. Configure Environment Files
+Copy `.env.example` to create your local `.env` configuration file:
+```bash
+cp .env.example .env
+```
+*(On Windows PowerShell: `copy .env.example .env`)*
 
-## Code of Conduct
+Configure your **MySQL database credentials** inside the `.env` file:
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=instaapp
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 5. Generate Application Key
+```bash
+php artisan key:generate
+```
 
-## Security Vulnerabilities
+### 6. Setup Database & Storage
+Create a new MySQL database named `instaapp` (or matching your `DB_DATABASE` in `.env`):
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```sql
+CREATE DATABASE instaapp;
+```
+
+Run database migrations:
+```bash
+php artisan migrate
+```
+
+Link storage for uploaded media access:
+```bash
+php artisan storage:link
+```
+
+### 7. Run the Development Application
+Run both the Laravel backend server and Vite frontend concurrently:
+```bash
+composer run dev
+```
+
+*Alternatively, you can run them in separate terminal windows:*
+```bash
+# Terminal 1: PHP Server
+php artisan serve
+
+# Terminal 2: Vite Dev Server
+npm run dev
+```
+
+### 8. Access in Browser
+Open your browser and navigate to:
+```
+http://localhost:8000
+```
+
+---
+
+## Testing & Production Build
+
+### Run Unit/Feature Tests
+```bash
+php artisan test
+```
+
+### Build Frontend for Production
+```bash
+npm run build
+```
+
+---
+
+## Project Structure
+
+```
+instaapp/
+├── app/
+│   ├── Http/Controllers/  # Controllers (PostController, CommentController, LikeController, etc.)
+│   └── Models/            # Eloquent Models (User, Post, Comment, Like)
+├── database/              # Migrations, seeders, and factories
+├── resources/js/          # React components, pages (Inertia.js), and layouts
+├── routes/                # Application routes (web.php, auth.php)
+└── storage/               # Uploaded files and application logs
+```
+
+---
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is open-sourced under the [MIT License](LICENSE).
